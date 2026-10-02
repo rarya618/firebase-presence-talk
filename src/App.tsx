@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { goOffline, goOnline } from 'firebase/database'
+import { QRCodeSVG } from 'qrcode.react'
 import { db } from './firebase'
 import {
   type PresenceEntry,
@@ -14,14 +15,6 @@ const ANIMALS = ['Otter', 'Falcon', 'Panda', 'Lynx', 'Koala', 'Heron']
 function randomName() {
   const pick = (list: string[]) => list[Math.floor(Math.random() * list.length)]
   return `${pick(ADJECTIVES)} ${pick(ANIMALS)}`
-}
-
-function timeAgo(timestamp: number, now: number) {
-  const seconds = Math.max(0, Math.round((now - timestamp) / 1000))
-  if (seconds < 60) return `${seconds}s ago`
-  const minutes = Math.round(seconds / 60)
-  if (minutes < 60) return `${minutes}m ago`
-  return `${Math.round(minutes / 60)}h ago`
 }
 
 // sessionStorage is per tab, so every tab is a separate person, and a
@@ -39,7 +32,6 @@ function App() {
   const [name] = useState(() => sessionValue('presence-name', randomName))
   const [connected, setConnected] = useState(false)
   const [entries, setEntries] = useState<PresenceEntry[]>([])
-  const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => trackPresence(id, name), [id, name])
 
@@ -47,66 +39,58 @@ function App() {
 
   useEffect(() => subscribeToConnectionState(setConnected), [])
 
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(id)
-  }, [])
-
-  const sorted = [...entries].sort(
-    (a, b) =>
-      Number(b.connections > 0) - Number(a.connections > 0) ||
-      (b.lastOnline ?? 0) - (a.lastOnline ?? 0),
+  // One dot per open connection, i.e. per device that has the page open.
+  const devices = entries.flatMap((entry) =>
+    Array.from({ length: entry.connections }, (_, i) => ({
+      key: `${entry.id}-${i}`,
+      mine: entry.id === id,
+    })),
   )
-  const onlineCount = entries.filter((e) => e.connections > 0).length
+  const shareUrl = window.location.origin
 
   return (
     <main>
-      <header>
-        <h1>Who's here?</h1>
-        <p className="muted">
-          {onlineCount} online
-        </p>
-      </header>
-
-      <section className="me">
-        <span className={`dot ${connected ? 'online' : 'offline'}`} />
-        <div>
-          <strong>{name}</strong>
-          <div className="muted">
-            {connected ? 'Connected' : 'Disconnected'}
-          </div>
+      <section className="count">
+        {/* Keyed on the count so the pop animation replays on every change. */}
+        <div key={devices.length} className="number">
+          {devices.length}
         </div>
-        <button
-          type="button"
-          onClick={() => (connected ? goOffline(db) : goOnline(db))}
-        >
-          {connected ? 'Go offline' : 'Go online'}
-        </button>
+        <div className="label">
+          {devices.length === 1 ? 'device connected' : 'devices connected'}
+        </div>
+
+        <div className="devices">
+          {devices.map((device) => (
+            <span
+              key={device.key}
+              className={`dot online${device.mine ? ' mine' : ''}`}
+            />
+          ))}
+        </div>
+
+        <div className="me">
+          <span className={`dot ${connected ? 'online' : 'offline'}`} />
+          <span>
+            <strong>{name}</strong>
+            <span className="muted">
+              {connected ? ' · connected' : ' · disconnected'}
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={() => (connected ? goOffline(db) : goOnline(db))}
+          >
+            {connected ? 'Go offline' : 'Go online'}
+          </button>
+        </div>
       </section>
 
-      <ul className="list">
-        {sorted.map((entry) => {
-          const online = entry.connections > 0
-          return (
-            <li key={entry.id}>
-              <span className={`dot ${online ? 'online' : 'offline'}`} />
-              <span className="name">
-                {entry.name}
-                {entry.id === id && <span className="muted"> (you)</span>}
-              </span>
-              <span className="muted">
-                {online
-                  ? entry.connections > 1
-                    ? `${entry.connections} connections`
-                    : 'online'
-                  : entry.lastOnline
-                    ? `last seen ${timeAgo(entry.lastOnline, now)}`
-                    : 'offline'}
-              </span>
-            </li>
-          )
-        })}
-      </ul>
+      <section className="join">
+        <div className="qr">
+          <QRCodeSVG value={shareUrl} size={512} marginSize={2} />
+        </div>
+        <div className="muted">{shareUrl.replace(/^https?:\/\//, '')}</div>
+      </section>
     </main>
   )
 }

@@ -33,14 +33,23 @@ body {
 }
 
 main {
-  max-width: 480px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 48px;
+  min-height: 100vh;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 48px 16px;
+  padding: 48px 32px;
 }
 
-h1 {
-  margin: 0;
-  font-size: 2rem;
+/* Phones (and narrow windows) stack the count above the QR code. */
+@media (max-width: 760px) {
+  main {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    padding: 32px 16px;
+  }
 }
 
 .muted {
@@ -48,16 +57,55 @@ h1 {
   font-size: 0.9rem;
 }
 
-.me,
-.list li {
+.number {
+  font-size: clamp(6rem, 18vw, 14rem);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  animation: pop 0.4s ease-out;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(1.15);
+    color: var(--online);
+  }
+}
+
+.label {
+  font-size: 1.5rem;
+  color: var(--muted);
+}
+
+.devices {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 32px 0;
+}
+
+.devices .dot {
+  width: 16px;
+  height: 16px;
+  animation: appear 0.4s ease-out;
+}
+
+.devices .dot.mine {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+@keyframes appear {
+  from {
+    transform: scale(0);
+  }
 }
 
 .me {
-  margin: 24px 0;
-  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -74,19 +122,27 @@ h1 {
   cursor: pointer;
 }
 
-.list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.join {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
 }
 
-.list li {
-  padding: 12px 4px;
-  border-bottom: 1px solid var(--border);
+/* White tile so the code scans in dark mode too. */
+.qr {
+  width: 100%;
+  max-width: 480px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 16px;
 }
 
-.list .name {
-  flex: 1;
+.qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .dot {
