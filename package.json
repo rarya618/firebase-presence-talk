@@ -11,6 +11,7 @@
     "deploy": "npm run build && firebase deploy --only hosting,database,auth"
   },
   "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
     "firebase": "^12.19.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.8",
