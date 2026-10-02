@@ -28,6 +28,10 @@ There is no test suite.
 - `database.rules.json`: with no auth, `/presence` is world-readable and world-writable; `.validate` rules enforce the data shape above and reject unknown keys. Update the rules alongside any data-shape change.
 - `src/App.tsx` wires it together; "Go offline" uses `goOffline(db)` to demo disconnect without killing Wi-Fi. While offline, a client's own list is stale (local cache) — that's expected and a talk point.
 
+## Working together
+
+Don't default to agreeing. If a request or decision seems wrong (technically unsound, risky, or worse than an alternative), say so and explain why before going along with it. The user would rather be challenged than humored.
+
 ## Git workflow
 
 Never commit automatically. When a change is done, send a list of what changed and end with a suggested commit message, written after checking `git log` so it matches the existing history's style.
