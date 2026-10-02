@@ -1,6 +1,6 @@
 :root {
   --bg: #fff9f2;
-  --surface: #ffffff;
+  --surface: #fcebeb;
   --text: #800020;
   --muted: color-mix(in srgb, var(--text) 65%, var(--bg));
   --border: color-mix(in srgb, var(--text) 15%, var(--bg));
@@ -122,12 +122,12 @@ main {
   text-align: center;
 }
 
-/* White tile keeps the code high-contrast for scanning. */
+/* Light tile keeps the code high-contrast for scanning. */
 .qr {
   width: 100%;
   max-width: 480px;
   padding: 16px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 16px;
 }
 
