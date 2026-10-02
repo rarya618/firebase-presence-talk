@@ -51,7 +51,7 @@ main {
 }
 
 .number {
-  font-size: clamp(6rem, 18vw, 14rem);
+  font-size: clamp(4.5rem, 13vw, 10rem);
   font-weight: 800;
   line-height: 1;
   font-variant-numeric: tabular-nums;
