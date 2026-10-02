@@ -51,17 +51,6 @@ function App() {
 
   useEffect(() => subscribeToConnectionState(setConnected), [])
 
-  // Backgrounded pages keep (or slowly lose) their socket, so the server
-  // wouldn't notice for a while. Disconnect cleanly instead: the server runs
-  // our onDisconnect handlers right away, and we reconnect on return.
-  useEffect(() => {
-    const onVisibilityChange = () =>
-      document.hidden ? goOffline(db) : goOnline(db)
-    document.addEventListener('visibilitychange', onVisibilityChange)
-    return () =>
-      document.removeEventListener('visibilitychange', onVisibilityChange)
-  }, [])
-
   // One dot per online user. Each tab is its own anonymous user, so this is
   // one per device, and stuffing fake connections into your own entry still
   // only counts once.
@@ -98,6 +87,12 @@ function App() {
               {connected ? ' · connected' : ' · disconnected'}
             </span>
           </span>
+          <button
+            type="button"
+            onClick={() => (connected ? goOffline(db) : goOnline(db))}
+          >
+            {connected ? 'Go offline' : 'Go online'}
+          </button>
         </div>
       </section>
 

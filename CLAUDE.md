@@ -26,4 +26,4 @@ There is no test suite.
   - `onDisconnect` is armed *before* writing the connection node, so there's never an online entry without pending cleanup.
   - The `stopped` flag guards against React StrictMode's double-mount writing a ghost connection after cleanup.
 - `database.rules.json`: `/presence` is world-readable; `/presence/{id}` is writable only when `auth.uid === id`. `.validate` rules enforce the data shape above and reject unknown keys. Update the rules alongside any data-shape change.
-- `src/App.tsx` wires it together; backgrounding the page (`visibilitychange`) calls `goOffline(db)` and returning calls `goOnline(db)`, so leaving is visible instantly instead of after a socket timeout. While offline, a client's own count is stale (local cache) — that's expected and a talk point.
+- `src/App.tsx` wires it together; "Go offline" uses `goOffline(db)` to demo disconnect without killing Wi-Fi. While offline, a client's own count is stale (local cache) — that's expected and a talk point.

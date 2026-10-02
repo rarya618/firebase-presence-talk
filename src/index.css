@@ -104,6 +104,18 @@ main {
   border-radius: 12px;
 }
 
+.me button {
+  margin-left: auto;
+  padding: 8px 14px;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 .join {
   display: flex;
   flex-direction: column;
