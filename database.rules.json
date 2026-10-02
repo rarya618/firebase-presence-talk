@@ -12,8 +12,12 @@
         },
         "connections": {
           "$connectionId": {
+            ".validate": "newData.hasChildren(['startedAt', 'lastSeen'])",
             "startedAt": {
               ".validate": "newData.isNumber()"
+            },
+            "lastSeen": {
+              ".validate": "newData.isNumber() && newData.val() <= now"
             },
             "$other": {
               ".validate": false
