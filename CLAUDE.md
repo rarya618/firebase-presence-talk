@@ -27,3 +27,7 @@ There is no test suite.
   - The `stopped` flag guards against React StrictMode's double-mount writing a ghost connection after cleanup.
 - `database.rules.json`: with no auth, `/presence` is world-readable and world-writable; `.validate` rules enforce the data shape above and reject unknown keys. Update the rules alongside any data-shape change.
 - `src/App.tsx` wires it together; "Go offline" uses `goOffline(db)` to demo disconnect without killing Wi-Fi. While offline, a client's own list is stale (local cache) — that's expected and a talk point.
+
+## Git workflow
+
+Never commit automatically. When a change is done, send a list of what changed and end with a suggested commit message, written after checking `git log` so it matches the existing history's style.
