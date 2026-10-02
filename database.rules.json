@@ -1,0 +1,29 @@
+{
+  "rules": {
+    "presence": {
+      ".read": true,
+      "$id": {
+        ".write": true,
+        "name": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40"
+        },
+        "lastOnline": {
+          ".validate": "newData.isNumber()"
+        },
+        "connections": {
+          "$connectionId": {
+            "startedAt": {
+              ".validate": "newData.isNumber()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}
