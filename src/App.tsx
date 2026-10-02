@@ -51,6 +51,18 @@ function App() {
 
   useEffect(() => subscribeToConnectionState(setConnected), [])
 
+  // A hint, not the source of truth: when the page is hidden we hang up
+  // ourselves so onDisconnect runs right away. If the client never gets the
+  // chance (crash, dead network, frozen tab), the server still notices the
+  // silent socket and runs it later.
+  useEffect(() => {
+    const onVisibilityChange = () =>
+      document.hidden ? goOffline(db) : goOnline(db)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () =>
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+  }, [])
+
   // One dot per online user. Each tab is its own anonymous user, so this is
   // one per device, and stuffing fake connections into your own entry still
   // only counts once.
