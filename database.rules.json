@@ -3,7 +3,7 @@
     "presence": {
       ".read": true,
       "$id": {
-        ".write": true,
+        ".write": "auth != null && auth.uid === $id",
         "name": {
           ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40"
         },

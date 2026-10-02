@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app'
+import { browserSessionPersistence, initializeAuth } from 'firebase/auth'
 import { getDatabase } from 'firebase/database'
 
 const app = initializeApp({
@@ -9,3 +10,9 @@ const app = initializeApp({
 })
 
 export const db = getDatabase(app)
+
+// Session persistence keeps the anonymous user per tab, so each tab is still
+// its own person, and a reload signs back in as the same user.
+export const auth = initializeAuth(app, {
+  persistence: browserSessionPersistence,
+})

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { goOffline, goOnline } from 'firebase/database'
+import { onAuthStateChanged, signInAnonymously } from 'firebase/auth'
 import { QRCodeSVG } from 'qrcode.react'
-import { db } from './firebase'
+import { auth, db } from './firebase'
 import {
   type PresenceEntry,
   subscribeToConnectionState,
@@ -17,8 +18,8 @@ function randomName() {
   return `${pick(ADJECTIVES)} ${pick(ANIMALS)}`
 }
 
-// sessionStorage is per tab, so every tab is a separate person, and a
-// reload keeps the same identity instead of leaving a stale entry behind.
+// The name lives in sessionStorage next to the (per-tab) anonymous user,
+// so a reload keeps both.
 function sessionValue(key: string, create: () => string) {
   const existing = sessionStorage.getItem(key)
   if (existing) return existing
@@ -28,24 +29,34 @@ function sessionValue(key: string, create: () => string) {
 }
 
 function App() {
-  const [id] = useState(() => sessionValue('presence-id', () => crypto.randomUUID()))
+  const [uid, setUid] = useState<string | null>(null)
   const [name] = useState(() => sessionValue('presence-name', randomName))
   const [connected, setConnected] = useState(false)
   const [entries, setEntries] = useState<PresenceEntry[]>([])
 
-  useEffect(() => trackPresence(id, name), [id, name])
+  // Sign in anonymously: no UI, but the uid lets the rules make sure each
+  // person can only write their own /presence entry.
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, (user) => {
+        if (user) setUid(user.uid)
+        else void signInAnonymously(auth)
+      }),
+    [],
+  )
+
+  useEffect(() => (uid ? trackPresence(uid, name) : undefined), [uid, name])
 
   useEffect(() => subscribeToPresence(setEntries), [])
 
   useEffect(() => subscribeToConnectionState(setConnected), [])
 
-  // One dot per open connection, i.e. per device that has the page open.
-  const devices = entries.flatMap((entry) =>
-    Array.from({ length: entry.connections }, (_, i) => ({
-      key: `${entry.id}-${i}`,
-      mine: entry.id === id,
-    })),
-  )
+  // One dot per online user. Each tab is its own anonymous user, so this is
+  // one per device, and stuffing fake connections into your own entry still
+  // only counts once.
+  const devices = entries
+    .filter((entry) => entry.connections > 0)
+    .map((entry) => ({ key: entry.id, mine: entry.id === uid }))
   const shareUrl = window.location.origin
 
   return (
