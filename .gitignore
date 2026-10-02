@@ -28,3 +28,8 @@ dist-ssr
 firebase-debug.log
 database-debug.log
 ui-debug.log
+
+# Agent skills installed locally by firebase init
+.agents
+.claude
+skills-lock.json
